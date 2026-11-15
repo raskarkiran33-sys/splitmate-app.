@@ -1,0 +1,517 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080f1c">
+<title>SplitMate Global</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#080f1c;
+--panel:#111e30;
+--panel2:#192a40;
+--green:#37dfa8;
+--text:#f4f7ff;
+--muted:#94a6bd;
+--border:#293d55;
+}
+body{
+background:var(--bg);
+color:var(--text);
+font-family:Inter,Arial,sans-serif;
+}
+header{
+height:75px;
+padding:0 6%;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid var(--border);
+background:#0b1524;
+}
+.logo{
+font-size:23px;
+font-weight:900;
+color:var(--green);
+}
+select,input{
+background:#13243a;
+color:white;
+border:1px solid var(--border);
+padding:12px;
+border-radius:9px;
+outline:none;
+}
+button{
+border:0;
+padding:12px 17px;
+border-radius:9px;
+cursor:pointer;
+font-weight:bold;
+}
+.primary{
+background:var(--green);
+color:#06251b;
+}
+.secondary{
+background:#263d59;
+color:white;
+}
+.container{
+max-width:1100px;
+margin:auto;
+padding:35px 20px;
+}
+.hero{
+text-align:center;
+padding:55px 10px;
+}
+.hero h1{
+font-size:clamp(35px,6vw,65px);
+letter-spacing:-2px;
+}
+.hero h1 span{color:var(--green)}
+.hero p{
+color:var(--muted);
+margin:15px auto;
+max-width:550px;
+}
+.hero button{margin-top:15px}
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:17px;
+margin:25px 0;
+}
+.card{
+background:var(--panel);
+border:1px solid var(--border);
+padding:22px;
+border-radius:15px;
+}
+.card h3{margin-bottom:10px}
+.card p,.muted{
+color:var(--muted);
+font-size:13px;
+}
+.price{
+font-size:31px;
+font-weight:bold;
+color:var(--green);
+margin:12px 0;
+}
+.price small{font-size:13px;color:var(--muted)}
+.featured{
+border-color:var(--green);
+box-shadow:0 0 20px #37dfa812;
+}
+ul{list-style:none;margin:18px 0}
+li{padding:7px 0;font-size:14px}
+li:before{content:"✓ ";color:var(--green)}
+.full{width:100%;margin-top:15px}
+.section-title{
+text-align:center;
+margin:45px 0 20px;
+}
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+.stat{
+background:var(--panel2);
+padding:18px;
+border-radius:12px;
+}
+.stat strong{
+display:block;
+font-size:24px;
+margin-top:8px;
+}
+input{width:100%;margin:8px 0 15px}
+label{font-size:13px;color:var(--muted)}
+.panel{
+background:var(--panel);
+border:1px solid var(--border);
+padding:23px;
+border-radius:15px;
+margin:20px 0;
+}
+.payment-option{
+display:flex;
+gap:10px;
+align-items:center;
+padding:12px;
+border:1px solid var(--border);
+border-radius:10px;
+margin:8px 0;
+cursor:pointer;
+}
+.payment-option input{width:auto;margin:0}
+footer{
+border-top:1px solid var(--border);
+padding:30px;
+text-align:center;
+color:var(--muted);
+font-size:12px;
+margin-top:50px;
+}
+.hidden{display:none}
+@media(max-width:700px){
+.grid{grid-template-columns:1fr}
+.stats{grid-template-columns:1fr 1fr}
+header{padding:0 15px}
+.logo{font-size:19px}
+.container{padding:20px 14px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">◈ SplitMate Global</div>
+
+<div style="display:flex;gap:8px">
+<select id="language">
+<option value="en">English</option>
+<option value="hi">हिन्दी</option>
+<option value="mr">मराठी</option>
+<option value="es">Español</option>
+<option value="fr">Français</option>
+<option value="de">Deutsch</option>
+<option value="ar">العربية</option>
+<option value="ja">日本語</option>
+</select>
+<select id="currency">
+<option value="INR">INR ₹</option>
+<option value="USD">USD $</option>
+<option value="EUR">EUR €</option>
+<option value="GBP">GBP £</option>
+<option value="AED">AED د.إ</option>
+<option value="JPY">JPY ¥</option>
+<option value="CAD">CAD $</option>
+<option value="AUD">AUD $</option>
+<option value="SGD">SGD $</option>
+<option value="BRL">BRL R$</option>
+</select>
+</div>
+</header>
+
+<main class="container">
+
+<section class="hero">
+<p style="color:var(--green)">GLOBAL EXPENSE MANAGEMENT</p>
+<h1>Split Expenses.<br><span>Not Friendships.</span></h1>
+<p>
+Manage group expenses, share bills, track balances
+and settle payments with friends around the world.
+</p>
+<button class="primary" onclick="scrollToSection('plans')">
+Explore Plans →
+</button>
+</section>
+
+<section id="dashboard" class="hidden">
+<h2>Dashboard</h2>
+<div class="stats">
+<div class="stat">Total Expenses<strong id="total">₹0</strong></div>
+<div class="stat">You Owe<strong id="owe">₹0</strong></div>
+<div class="stat">You Are Owed<strong id="owed">₹0</strong></div>
+</div>
+<div class="panel">
+<h3>Add Expense</h3>
+<label>Description</label>
+<input id="desc" placeholder="Dinner, Travel, Shopping">
+<label>Amount</label>
+<input id="amount" type="number" min="0.01" step="0.01">
+<label>Paid by</label>
+<input id="payer" placeholder="Your name">
+<button class="primary" onclick="addExpense()">Add Expense</button>
+<div id="history"></div>
+</div>
+</section>
+
+<h2 class="section-title">Why SplitMate?</h2>
+
+<div class="grid">
+<div class="card">
+<h3>🌍 Global Currency</h3>
+<p>Support multiple currencies and local currency display.</p>
+</div>
+<div class="card">
+<h3>👥 Smart Groups</h3>
+<p>Organize expenses with friends, family and roommates.</p>
+</div>
+<div class="card">
+<h3>🔐 Secure Platform</h3>
+<p>Designed for secure accounts and protected expense data.</p>
+</div>
+</div>
+
+<section id="plans">
+<h2 class="section-title">Simple Pricing</h2>
+<p class="muted" style="text-align:center">
+Affordable plans for everyone. Choose your country and currency.
+</p>
+
+<div class="grid">
+
+<div class="card">
+<h3>Free</h3>
+<div class="price" data-price="free">₹0</div>
+<ul>
+<li>Personal expense tracking</li>
+<li>Basic group splitting</li>
+<li>Basic dashboard</li>
+<li>Expense history</li>
+</ul>
+<button class="secondary full" onclick="activateFree()">Get Started</button>
+</div>
+
+<div class="card featured">
+<h3>Plus ⭐</h3>
+<div class="price" data-price="plus">₹49<small>/month</small></div>
+<ul>
+<li>Unlimited groups</li>
+<li>Unlimited friends</li>
+<li>Multiple currencies</li>
+<li>Expense analytics</li>
+<li>CSV export</li>
+<li>7-day trial where eligible</li>
+</ul>
+<button class="primary full" onclick="buy('plus')">Start Free Trial</button>
+</div>
+
+<div class="card">
+<h3>Pro</h3>
+<div class="price" data-price="pro">₹99<small>/month</small></div>
+<ul>
+<li>Everything in Plus</li>
+<li>Advanced reports</li>
+<li>Receipt management</li>
+<li>Recurring expenses</li>
+<li>Priority support</li>
+</ul>
+<button class="secondary full" onclick="buy('pro')">Choose Pro</button>
+</div>
+
+</div>
+</section>
+
+<section class="panel" id="checkout">
+<h2>🌐 Global Checkout</h2>
+<p class="muted">Payment methods depend on your country and gateway eligibility.</p>
+
+<label>Country</label>
+<select id="country" onchange="updatePayments()">
+<option value="IN">🇮🇳 India</option>
+<option value="US">🇺🇸 United States</option>
+<option value="GB">🇬🇧 United Kingdom</option>
+<option value="AE">🇦🇪 UAE</option>
+<option value="DE">🇩🇪 Germany</option>
+<option value="FR">🇫🇷 France</option>
+<option value="JP">🇯🇵 Japan</option>
+<option value="SG">🇸🇬 Singapore</option>
+<option value="AU">🇦🇺 Australia</option>
+<option value="CA">🇨🇦 Canada</option>
+</select>
+
+<h3 style="margin-top:18px">Available payment methods</h3>
+<div id="paymentMethods"></div>
+
+<button class="primary full" onclick="checkout()">
+Continue to Secure Checkout
+</button>
+
+<p class="muted" style="margin-top:12px">
+Checkout requires a verified merchant account and secure server integration.
+</p>
+</section>
+
+<footer>
+<strong>SplitMate Global</strong>
+<p style="margin-top:8px">
+Shared expenses. Simplified worldwide.
+</p>
+<p style="margin-top:8px">© 2026 SplitMate Global</p>
+</footer>
+
+</main>
+
+<script>
+const rates = {
+INR:1,USD:0.012,EUR:0.0104,GBP:0.0089,
+AED:0.044,JPY:1.85,CAD:0.0165,AUD:0.018,
+SGD:0.015,BRL:0.065
+};
+
+const symbols = {
+INR:"₹",USD:"$",EUR:"€",GBP:"£",
+AED:"د.إ",JPY:"¥",CAD:"C$",AUD:"A$",
+SGD:"S$",BRL:"R$"
+};
+
+const prices = {free:0,plus:49,pro:99};
+let selectedPlan="plus";
+let expenses=[];
+
+const translations={
+en:{},
+hi:{
+"GLOBAL EXPENSE MANAGEMENT":"वैश्विक खर्च प्रबंधन",
+"Split Expenses.":"खर्च बांटें।",
+"Not Friendships.":"दोस्ती नहीं।",
+"Explore Plans →":"प्लान देखें →",
+"Why SplitMate?":"SplitMate क्यों?",
+"Simple Pricing":"आसान और सस्ते प्लान"
+},
+mr:{
+"GLOBAL EXPENSE MANAGEMENT":"जागतिक खर्च व्यवस्थापन",
+"Why SplitMate?":"SplitMate का?",
+"Simple Pricing":"सोपे आणि परवडणारे प्लॅन"
+}
+};
+
+function format(amount){
+const c=document.getElementById("currency").value;
+return new Intl.NumberFormat(
+navigator.language,
+{style:"currency",currency:c}
+).format(amount);
+}
+
+function updatePrices(){
+const c=document.getElementById("currency").value;
+document.querySelectorAll("[data-price]").forEach(el=>{
+const p=el.dataset.price;
+el.innerHTML=format(prices[p]*rates[c])+
+(p==="free"?"":"<small>/month</small>");
+});
+document.getElementById("total").textContent=format(
+expenses.reduce((a,e)=>a+e.amount,0)
+);
+document.getElementById("owe").textContent=format(0);
+document.getElementById("owed").textContent=format(0);
+}
+
+document.getElementById("currency").addEventListener("change",updatePrices);
+
+document.getElementById("language").addEventListener("change",e=>{
+const lang=e.target.value;
+document.documentElement.lang=lang;
+const map=translations[lang]||{};
+document.querySelectorAll("body *").forEach(el=>{
+if(el.children.length===0 && el.textContent.trim()){
+const old=el.textContent.trim();
+if(map[old])el.textContent=map[old];
+}
+});
+});
+
+function scrollToSection(id){
+document.getElementById(id).scrollIntoView({behavior:"smooth"});
+}
+
+function activateFree(){
+document.getElementById("dashboard").classList.remove("hidden");
+scrollToSection("dashboard");
+}
+
+function addExpense(){
+const desc=document.getElementById("desc").value.trim();
+const amount=Number(document.getElementById("amount").value);
+const payer=document.getElementById("payer").value.trim();
+
+if(!desc||!Number.isFinite(amount)||amount<=0||!payer){
+alert("Please complete all expense details.");
+return;
+}
+
+expenses.push({desc,amount,payer});
+
+document.getElementById("history").innerHTML=
+expenses.map(e=>
+`<div style="padding:12px;border-top:1px solid #293d55">
+${escapeHTML(e.desc)} — ${format(e.amount)}
+<br><small>${escapeHTML(e.payer)} paid</small>
+</div>`).join("");
+
+document.getElementById("desc").value="";
+document.getElementById("amount").value="";
+updatePrices();
+}
+
+function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",
+'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+function buy(plan){
+selectedPlan=plan;
+scrollToSection("checkout");
+updatePayments();
+}
+
+function updatePayments(){
+const country=document.getElementById("country").value;
+const box=document.getElementById("paymentMethods");
+
+let methods=[];
+
+if(country==="IN"){
+methods=[
+["upi","UPI – Google Pay / PhonePe / Paytm"],
+["netbanking","Net Banking"],
+["wallet","Supported Wallets"],
+["card","Credit / Debit Card (optional)"]
+];
+}else if(country==="AE"){
+methods=[
+["local","Supported UAE local payment methods"],
+["card","International Cards"]
+];
+}else{
+methods=[
+["stripe","Stripe – Local supported methods"],
+["card","Credit / Debit Card"]
+];
+}
+
+box.innerHTML=methods.map((m,i)=>`
+<label class="payment-option">
+<input type="radio" name="payment" value="${m[0]}" ${i===0?"checked":""}>
+${m[1]}
+</label>`).join("");
+}
+
+function checkout(){
+const country=document.getElementById("country").value;
+const payment=document.querySelector('input[name="payment"]:checked');
+
+if(!payment){
+alert("Select a payment method.");
+return;
+}
+
+// No real payment is processed by this frontend.
+// The backend must create a verified provider checkout session.
+alert(
+"Selected plan: "+selectedPlan.toUpperCase()+
+"\nCountry: "+country+
+"\nMethod: "+payment.value+
+"\n\nSecure payment backend is not connected yet. No money has been charged."
+);
+}
+
+updatePayments();
+updatePrices();
+</script>
+
+</body>
+</html>
