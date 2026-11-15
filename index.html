@@ -1,58 +1,191 @@
-
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meri Website</title>
+  <title>SplitMate - Share expenses, not stress</title>
+  <meta name="description" content="SplitMate helps friends, roommates and families split bills and track who owes what.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Navbar -->
+  <!-- NAVBAR -->
   <header class="navbar">
     <div class="container nav-inner">
-      <a href="#home" class="logo">MeriSite</a>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
+      <a href="#" class="logo">
+        <span class="logo-icon">S</span>
+        SplitMate
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#download">Download</a>
       </nav>
+      <div class="nav-actions">
+        <a href="#" class="link-login">Log in</a>
+        <a href="#" class="btn btn-primary btn-sm">Sign up</a>
+      </div>
     </div>
   </header>
 
-  <!-- Hero -->
-  <section id="home" class="hero">
-    <div class="container">
-      <h1>Aapka Swagat Hai!</h1>
-      <p>Yeh ek simple aur responsive starter website hai. Isse apne hisaab se badal lijiye.</p>
-      <a href="#features" class="btn">Aur Jaanein</a>
-    </div>
-  </section>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <span class="badge">Free to use</span>
+        <h1>Less stress when <span class="highlight">sharing expenses</span></h1>
+        <p>Keep track of shared expenses and balances with housemates, trips, groups, friends and family. Settle up in a tap.</p>
+        <div class="hero-buttons">
+          <a href="#download" class="btn btn-primary">Get started</a>
+          <a href="#how" class="btn btn-outline">See how it works</a>
+        </div>
+        <ul class="hero-points">
+          <li>No hidden fees</li>
+          <li>Works for groups</li>
+          <li>Simple &amp; fast</li>
+        </ul>
+      </div>
 
-  <!-- Features -->
-  <section id="features" class="features">
-    <div class="container">
-      <h2>Features</h2>
-      <div class="cards">
-        <div class="card">
-          <h3>Fast</h3>
-          <p>Halka aur tez loading wala design.</p>
-        </div>
-        <div class="card">
-          <h3>Responsive</h3>
-          <p>Mobile, tablet aur desktop sab par achha dikhta hai.</p>
-        </div>
-        <div class="card">
-          <h3>Customizable</h3>
-          <p>Colors aur text aasani se badal sakte hain.</p>
+      <!-- Phone mockup -->
+      <div class="hero-visual">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-header">
+            <span>Goa Trip</span>
+            <small>4 people</small>
+          </div>
+          <div class="balance-card">
+            <small>You are owed</small>
+            <strong>&#8377;2,450</strong>
+          </div>
+          <div class="expense">
+            <div class="expense-icon">&#127829;</div>
+            <div class="expense-info">
+              <b>Dinner</b>
+              <small>Paid by Rahul</small>
+            </div>
+            <div class="expense-amt owe">&#8377;640</div>
+          </div>
+          <div class="expense">
+            <div class="expense-icon">&#128663;</div>
+            <div class="expense-info">
+              <b>Taxi</b>
+              <small>Paid by you</small>
+            </div>
+            <div class="expense-amt get">&#8377;1,200</div>
+          </div>
+          <div class="expense">
+            <div class="expense-icon">&#127976;</div>
+            <div class="expense-info">
+              <b>Hotel</b>
+              <small>Paid by Priya</small>
+            </div>
+            <div class="expense-amt owe">&#8377;1,800</div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Contact -->
-  <section id="contact" class="contact">
+  <!-- FEATURES -->
+  <section id="features" class="section">
     <div class="container">
+      <div class="section-head">
+        <h2>Everything you need to split fairly</h2>
+        <p>Powerful features wrapped in a simple, friendly design.</p>
+      </div>
+      <div class="grid">
+        <div class="feature">
+          <div class="f-icon">&#128101;</div>
+          <h3>Create groups</h3>
+          <p>Make groups for trips, flats, office lunches or anything you share.</p>
+        </div>
+        <div class="feature">
+          <div class="f-icon">&#128181;</div>
+          <h3>Add expenses</h3>
+          <p>Split equally, by exact amounts, or by percentage in seconds.</p>
+        </div>
+        <div class="feature">
+          <div class="f-icon">&#9878;&#65039;</div>
+          <h3>Track balances</h3>
+          <p>See clearly who owes whom, always up to date.</p>
+        </div>
+        <div class="feature">
+          <div class="f-icon">&#9989;</div>
+          <h3>Settle up</h3>
+          <p>Record payments and clear your dues with a single tap.</p>
+        </div>
+        <div class="feature">
+          <div class="f-icon">&#128276;</div>
+          <h3>Reminders</h3>
+          <p>Friendly nudges so nobody forgets to pay back.</p>
+        </div>
+        <div class="feature">
+          <div class="f-icon">&#128200;</div>
+          <h3>Simple reports</h3>
+          <p>Understand where the group's money is going.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <h2>How it works</h2>
+        <p>Three easy steps to stop the awkward money talk.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <h3>Create a group</h3>
+          <p>Add your friends or housemates to a new group.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <h3>Add expenses</h3>
+          <p>Enter who paid and how it should be divided.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <h3>Settle up</h3>
+          <p>SplitMate shows the simplest way to get everyone even.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="download" class="cta">
+    <div class="container">
+      <h2>Ready to split smarter?</h2>
+      <p>Join SplitMate and make shared money simple.</p>
+      <a href="#" class="btn btn-white">Get started free</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="logo logo-light">
+          <span class="logo-icon">S</span> SplitMate
+        </a>
+        <p>Share expenses, not stress.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="container copy">&copy; 2026 SplitMate. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>
