@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SplitMate - Log in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: var(--green-light); min-height: 100vh; display: flex; flex-direction: column; }
+    .auth-wrap { flex: 1; display: grid; place-items: center; padding: 30px 0; }
+    .auth-card { width: 92%; max-width: 420px; background: #fff; border-radius: 18px; padding: 32px 28px; box-shadow: 0 20px 40px rgba(15,127,98,.15); }
+    .auth-card .logo { justify-content: center; margin-bottom: 20px; }
+    .tabs { display: flex; background: var(--bg-alt); border-radius: 10px; padding: 4px; margin-bottom: 22px; }
+    .tab { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 8px; font: 600 .95rem "Inter", sans-serif; color: var(--muted); cursor: pointer; }
+    .tab.active { background: #fff; color: var(--green-dark); box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font: 1rem "Inter", sans-serif; }
+    .field input:focus { outline: 2px solid var(--green); border-color: transparent; }
+    .auth-card .btn { width: 100%; margin-top: 6px; }
+    .msg { margin-top: 14px; padding: 10px 12px; border-radius: 10px; font-size: .9rem; display: none; }
+    .msg.error { display: block; background: #fdecea; color: #b42318; }
+    .msg.ok { display: block; background: var(--green-light); color: var(--green-dark); }
+    .back { text-align: center; margin-top: 18px; font-size: .9rem; }
+    .back a { color: var(--green-dark); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <a href="index.html" class="logo"><span class="logo-icon">S</span> SplitMate</a>
+
+      <div class="tabs">
+        <button type="button" class="tab" id="tab-login">Log in</button>
+        <button type="button" class="tab" id="tab-signup">Sign up</button>
+      </div>
+
+      <form id="form" novalidate>
+        <div class="field" id="name-field">
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Your name">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="name@company.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="At least 6 characters">
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-btn">Log in</button>
+        <div class="msg" id="msg"></div>
+      </form>
+
+      <p class="back"><a href="index.html">Back to home</a></p>
+    </div>
+  </div>
+
+  <script>
+    var mode = new URLSearchParams(location.search).get("mode") === "signup" ? "signup" : "login";
+    var tabLogin = document.getElementById("tab-login");
+    var tabSignup = document.getElementById("tab-signup");
+    var nameField = document.getElementById("name-field");
+    var submitBtn = document.getElementById("submit-btn");
+    var msg = document.getElementById("msg");
+
+    function setMode(m) {
+      mode = m;
+      tabLogin.classList.toggle("active", m === "login");
+      tabSignup.classList.toggle("active", m === "signup");
+      nameField.style.display = m === "signup" ? "block" : "none";
+      submitBtn.textContent = m === "signup" ? "Create account" : "Log in";
+      msg.className = "msg";
+    }
+
+    function show(text, type) {
+      msg.textContent = text;
+      msg.className = "msg " + type;
+    }
+
+    async function hash(text) {
+      var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+      return Array.from(new Uint8Array(buf)).map(function (b) {
+        return b.toString(16).padStart(2, "0");
+      }).join("");
+    }
+
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem("splitmate_users") || "[]"); }
+      catch (e) { return []; }
+    }
+
+    tabLogin.onclick = function () { setMode("login"); };
+    tabSignup.onclick = function () { setMode("signup"); };
+
+    document.getElementById("form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var name = document.getElementById("name").value.trim();
+      var email = document.getElementById("email").value.trim().toLowerCase();
+      var password = document.getElementById("password").value;
+
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) { show("Enter a valid email.", "error"); return; }
+      if (password.length < 6) { show("Password must be at least 6 characters.", "error"); return; }
+
+      var users = getUsers();
+      var pass = await hash(password);
+
+      if (mode === "signup") {
+        if (!name) { show("Enter your name.", "error"); return; }
+        if (users.some(function (u) { return u.email === email; })) {
+          show("That email is already registered. Try logging in.", "error"); return;
+        }
+        users.push({ name: name, email: email, pass: pass });
+        localStorage.setItem("splitmate_users", JSON.stringify(users));
+        localStorage.setItem("splitmate_current", JSON.stringify({ name: name, email: email }));
+        show("Account created. Welcome, " + name + "!", "ok");
+      } else {
+        var user = users.find(function (u) { return u.email === email && u.pass === pass; });
+        if (!user) { show("Wrong email or password.", "error"); return; }
+        localStorage.setItem("splitmate_current", JSON.stringify({ name: user.name, email: user.email }));
+        show("Welcome back, " + user.name + "!", "ok");
+      }
+    });
+
+    setMode(mode);
+  </script>
+
+</body>
+</html>
