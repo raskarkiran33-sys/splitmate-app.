@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SplitMate - Your groups</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: var(--bg-alt); min-height: 100vh; }
+    .app { padding: 26px 0 70px; max-width: 760px; }
+    .hello { color: var(--muted); font-weight: 500; font-size: .95rem; }
+    .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 18px; }
+    .panel h2 { font-size: 1.2rem; margin-bottom: 14px; }
+    .panel h3 { font-size: 1rem; margin-bottom: 10px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .row > input, .row > select { flex: 1; min-width: 140px; }
+    .app input[type=text], .app input[type=number], .app select { padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px; font: 1rem "Inter", sans-serif; background: #fff; width: 100%; }
+    .app input:focus, .app select:focus { outline: 2px solid var(--green); border-color: transparent; }
+    .app .btn { padding: 11px 20px; font-size: .95rem; }
+    .btn-danger { background: #fff; color: var(--red); border-color: #f3c9bd; }
+    .btn-danger:hover { background: #fdecea; }
+    .group-card { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .group-card:last-child { border-bottom: none; }
+    .group-card b { display: block; }
+    .group-card small, .muted { color: var(--muted); }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .chip { background: var(--green-light); color: var(--green-dark); padding: 5px 12px; border-radius: 50px; font-size: .9rem; font-weight: 600; }
+    .line { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .line:last-child { border-bottom: none; }
+    .get { color: var(--green); font-weight: 700; }
+    .owe { color: var(--red); font-weight: 700; }
+    .checks { display: flex; gap: 8px 16px; flex-wrap: wrap; margin: 12px 0; }
+    .checks label { display: flex; align-items: center; gap: 6px; font-size: .95rem; cursor: pointer; }
+    .err { color: #b42318; font-size: .9rem; margin-top: 8px; min-height: 1.2em; }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .top h1 { font-size: 1.6rem; }
+    .linkbtn { background: none; border: none; color: var(--green-dark); font-weight: 600; cursor: pointer; font: 600 .95rem "Inter", sans-serif; padding: 0; }
+    .x { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 4px 8px; }
+    .x:hover { color: var(--red); }
+    .empty { color: var(--muted); padding: 6px 0; }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="app.html" class="logo"><span class="logo-icon">S</span> SplitMate</a>
+      <div class="nav-actions">
+        <span class="hello" id="hello"></span>
+        <button type="button" class="btn btn-outline btn-sm" id="logout">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container app" id="app"></main>
+
+  <script>
+    var user = null;
+    try { user = JSON.parse(localStorage.getItem("splitmate_current") || "null"); } catch (e) {}
+    if (!user) { location.replace("login.html"); }
+
+    var KEY = "splitmate_data_" + (user ? user.email : "");
+    var data = { groups: [] };
+    try { data = JSON.parse(localStorage.getItem(KEY) || '{"groups":[]}'); } catch (e) {}
+    if (!data.groups) data.groups = [];
+    var cur = null;
+    var errMsg = "";
+    var appEl = document.getElementById("app");
+
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+    function money(c) {
+      var neg = c < 0; c = Math.abs(c);
+      var txt = (c / 100).toLocaleString("en-IN", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
+      return (neg ? "-" : "") + "\u20B9" + txt;
+    }
+    function group() { return data.groups.filter(function (g) { return g.id === cur; })[0]; }
+
+    function balances(g) {
+      var b = {};
+      g.members.forEach(function (m) { b[m] = 0; });
+      g.expenses.forEach(function (e) {
+        var n = e.split.length, base = Math.floor(e.cents / n), rem = e.cents - base * n;
+        b[e.paidBy] = (b[e.paidBy] || 0) + e.cents;
+        e.split.forEach(function (m, i) { b[m] = (b[m] || 0) - (base + (i < rem ? 1 : 0)); });
+      });
+      return b;
+    }
+
+    function settlements(b) {
+      var cr = [], db = [];
+      Object.keys(b).forEach(function (k) {
+        if (b[k] > 0) cr.push([k, b[k]]); else if (b[k] < 0) db.push([k, -b[k]]);
+      });
+      cr.sort(function (a, c) { return c[1] - a[1]; });
+      db.sort(function (a, c) { return c[1] - a[1]; });
+      var out = [], i = 0, j = 0;
+      while (i < db.length && j < cr.length) {
+        var x = Math.min(db[i][1], cr[j][1]);
+        out.push({ from: db[i][0], to: cr[j][0], c: x });
+        db[i][1] -= x; cr[j][1] -= x;
+        if (!db[i][1]) i++;
+        if (!cr[j][1]) j++;
+      }
+      return out;
+    }
+
+    function renderHome() {
+      var h = '<div class="top"><h1>Your groups</h1></div>';
+      h += '<div class="panel"><h2>Create a group</h2>' +
+        '<form data-form="addgroup"><div class="row">' +
+        '<input type="text" id="gname" placeholder="Goa trip" maxlength="40">' +
+        '<button type="submit" class="btn btn-primary">Create group</button></div>' +
+        '<div class="err">' + esc(errMsg) + '</div></form></div>';
+      h += '<div class="panel"><h2>Groups</h2>';
+      if (!data.groups.length) {
+        h += '<p class="empty">Start your first group. Add friends and share your first expense.</p>';
+      }
+      data.groups.forEach(function (g) {
+        h += '<div class="group-card"><div><b>' + esc(g.name) + '</b><small>' +
+          g.members.length + ' people \u00B7 ' + g.expenses.length + ' expenses</small></div>' +
+          '<button type="button" class="btn btn-primary btn-sm" data-open="' + g.id + '">Open</button></div>';
+      });
+      h += '</div>';
+      appEl.innerHTML = h;
+    }
+
+    function renderGroup() {
+      var g = group();
+      if (!g) { cur = null; return renderHome(); }
+      var b = balances(g), st = settlements(b);
+      var h = '<div class="top"><div><button type="button" class="linkbtn" data-back="1">&larr; All groups</button>' +
+        '<h1>' + esc(g.name) + '</h1></div>' +
+        '<button type="button" class="btn btn-danger btn-sm" data-delgroup="1">Delete group</button></div>';
+
+      h += '<div class="panel"><h2>People</h2><div class="chips">';
+      g.members.forEach(function (m) { h += '<span class="chip">' + esc(m) + '</span>'; });
+      h += '</div><form data-form="addmember"><div class="row">' +
+        '<input type="text" id="mname" placeholder="Friend\'s name" maxlength="30">' +
+        '<button type="submit" class="btn btn-outline">Add person</button></div>' +
+        '<div class="err" id="err-member"></div></form></div>';
+
+      h += '<div class="panel"><h2>Balances</h2>';
+      g.members.forEach(function (m) {
+        var v = b[m] || 0;
+        var cls = v > 0 ? "get" : v < 0 ? "owe" : "muted";
+        var txt = v > 0 ? "gets " + money(v) : v < 0 ? "owes " + money(-v) : "settled up";
+        h += '<div class="line"><span>' + esc(m) + '</span><span class="' + cls + '">' + txt + '</span></div>';
+      });
+      h += '</div>';
+
+      h += '<div class="panel"><h2>Settle up</h2>';
+      if (!st.length) h += '<p class="empty">Everyone is settled up.</p>';
+      st.forEach(function (s) {
+        h += '<div class="line"><span>' + esc(s.from) + ' pays ' + esc(s.to) + '</span><span class="owe">' + money(s.c) + '</span></div>';
+      });
+      h += '</div>';
+
+      h += '<div class="panel"><h2>Add an expense</h2>';
+      if (g.members.length < 2) {
+        h += '<p class="empty">Add at least one more person to split an expense.</p>';
+      } else {
+        h += '<form data-form="addexpense"><div class="row">' +
+          '<input type="text" id="edesc" placeholder="Dinner" maxlength="50">' +
+          '<input type="number" id="eamt" placeholder="Amount" min="0" step="0.01" inputmode="decimal"></div>' +
+          '<div class="row" style="margin-top:10px"><select id="epaid">';
+        g.members.forEach(function (m) { h += '<option value="' + esc(m) + '">Paid by ' + esc(m) + '</option>'; });
+        h += '</select></div><h3 style="margin-top:14px">Split equally between</h3><div class="checks">';
+        g.members.forEach(function (m) {
+          h += '<label><input type="checkbox" name="split" value="' + esc(m) + '" checked> ' + esc(m) + '</label>';
+        });
+        h += '</div><button type="submit" class="btn btn-primary">Add expense</button>' +
+          '<div class="err" id="err-exp"></div></form>';
+      }
+      h += '</div>';
+
+      h += '<div class="panel"><h2>Expenses</h2>';
+      if (!g.expenses.length) h += '<p class="empty">No expenses yet.</p>';
+      g.expenses.slice().reverse().forEach(function (e) {
+        h += '<div class="line"><div><b>' + esc(e.desc) + '</b><br><small class="muted">Paid by ' + esc(e.paidBy) +
+          ' \u00B7 split ' + e.split.length + ' ways</small></div><div><b>' + money(e.cents) +
+          '</b><button type="button" class="x" aria-label="Delete expense" data-delexp="' + e.id + '">&times;</button></div></div>';
+      });
+      h += '</div>';
+      appEl.innerHTML = h;
+    }
+
+    function render() { if (cur) renderGroup(); else renderHome(); window.scrollTo(0, 0); }
+    function setErr(id, t) { var el = document.getElementById(id); if (el) el.textContent = t; }
+
+    appEl.addEventListener("click", function (e) {
+      var t = e.target.closest("button");
+      if (!t) return;
+      if (t.dataset.open) { cur = t.dataset.open; errMsg = ""; render(); }
+      else if (t.dataset.back) { cur = null; errMsg = ""; render(); }
+      else if (t.dataset.delgroup) {
+        var g = group();
+        if (g && confirm('Delete "' + g.name + '" and all its expenses?')) {
+          data.groups = data.groups.filter(function (x) { return x.id !== cur; });
+          save(); cur = null; render();
+        }
+      } else if (t.dataset.delexp) {
+        var gg = group();
+        gg.expenses = gg.expenses.filter(function (x) { return x.id !== t.dataset.delexp; });
+        save(); var y = window.scrollY; renderGroup(); window.scrollTo(0, y);
+      }
+    });
+
+    appEl.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var f = e.target.dataset.form, g = group();
+      if (f === "addgroup") {
+        var name = document.getElementById("gname").value.trim();
+        if (!name) { errMsg = "Enter a group name."; renderHome(); return; }
+        var ng = { id: uid(), name: name, members: [user.name], expenses: [] };
+        data.groups.push(ng); save(); cur = ng.id; errMsg = ""; render();
+      } else if (f === "addmember") {
+        var m = document.getElementById("mname").value.trim();
+        if (!m) { setErr("err-member", "Enter a name."); return; }
+        if (g.members.some(function (x) { return x.toLowerCase() === m.toLowerCase(); })) {
+          setErr("err-member", "That name is already in the group."); return;
+        }
+        g.members.push(m); save(); var y = window.scrollY; renderGroup(); window.scrollTo(0, y);
+      } else if (f === "addexpense") {
+        var desc = document.getElementById("edesc").value.trim();
+        var amt = parseFloat(document.getElementById("eamt").value);
+        var paid = document.getElementById("epaid").value;
+        var split = Array.prototype.map.call(document.querySelectorAll('input[name="split"]:checked'), function (c) { return c.value; });
+        if (!desc) { setErr("err-exp", "Enter what the expense was for."); return; }
+        if (!(amt > 0)) { setErr("err-exp", "Enter an amount greater than 0."); return; }
+        if (!split.length) { setErr("err-exp", "Choose at least one person to split with."); return; }
+        g.expenses.push({ id: uid(), desc: desc, cents: Math.round(amt * 100), paidBy: paid, split: split });
+        save(); var y2 = window.scrollY; renderGroup(); window.scrollTo(0, y2);
+      }
+    });
+
+    if (user) {
+      document.getElementById("hello").textContent = "Hi, " + user.name.split(" ")[0];
+      document.getElementById("logout").onclick = function () {
+        try { localStorage.removeItem("splitmate_current"); } catch (e) {}
+        location.href = "index.html";
+      };
+      render();
+    }
+  </script>
+
+</body>
+</html>
